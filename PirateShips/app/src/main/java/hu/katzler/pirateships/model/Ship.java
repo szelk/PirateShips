@@ -9,10 +9,14 @@ public class Ship {
     public Ship(JSONObject jsonObject) {
         id = jsonObject.optInt("id", 0);
         price = jsonObject.optInt("price", 0);
-        title = !jsonObject.isNull("title") ? jsonObject.optString("title", "No title") : "No title";
-        description = jsonObject.optString("description", "No description");
-        image = jsonObject.optString("image", null);
-        greeting_type = jsonObject.optString("greeting_type", "Ahoi!");
+        title = getString(jsonObject, "title", "No title");
+        description = getString(jsonObject, "description", "No description");
+        image = getString(jsonObject, "image", null);
+        greeting_type = getString(jsonObject, "greeting_type", "Ahoi");
+    }
+
+    private String getString(JSONObject jsonObject, String name, String defaultValue) {
+        return !jsonObject.isNull(name) ? jsonObject.optString(name, defaultValue) : defaultValue;
     }
 
     public int getId() {
