@@ -20,6 +20,7 @@ public class PirateShipDownloader {
 
     public PirateShipDownloader(HttpHandler httpHandler) {
         this.httpHandler = httpHandler;
+        shipList = new ArrayList<>();
     }
 
     public List<Ship> downloadList() {

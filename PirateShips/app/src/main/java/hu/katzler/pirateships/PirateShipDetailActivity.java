@@ -3,7 +3,6 @@ package hu.katzler.pirateships;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -25,6 +26,7 @@ import hu.katzler.pirateships.model.Ship;
 public class PirateShipDetailActivity extends AppCompatActivity {
 
     private ImageView ivImage;
+    private TextView tvPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +37,6 @@ public class PirateShipDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -65,14 +60,21 @@ public class PirateShipDetailActivity extends AppCompatActivity {
             // using a fragment transaction.
             Bundle arguments = new Bundle();
             int id = getIntent().getIntExtra(PirateShipDetailFragment.ARG_ITEM_ID, 0);
-            Ship ship = App.get(this).getApplicationComponent().getPirateShipDownloader().getShip(id);
+            final Ship ship = App.get(this).getApplicationComponent().getPirateShipDownloader().getShip(id);
             arguments.putInt(PirateShipDetailFragment.ARG_ITEM_ID, id);
             PirateShipDetailFragment fragment = new PirateShipDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.pirateship_detail_container, fragment)
                     .commit();
+
             ImageLoader.getInstance().displayImage(ship.getImage(), ivImage);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(PirateShipDetailActivity.this, ship.getGreetingType(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
     }

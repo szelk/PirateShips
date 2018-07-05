@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -80,14 +79,17 @@ public class PirateShipListActivity extends AppCompatActivity {
 
         //View recyclerView = findViewById(R.id.pirateship_list);
         //assert recyclerView != null;
-        setupRecyclerView(recyclerView);
 
-        getListAsyncTask = new GetListAsyncTask();
-        getListAsyncTask.execute();
+        List<Ship> list = App.get(this).getApplicationComponent().getPirateShipDownloader().getShipList();
+        setupRecyclerView(recyclerView, list);
+        if (list == null || list.size() <= 0) {
+            getListAsyncTask = new GetListAsyncTask();
+            getListAsyncTask.execute();
+        }
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        adapter = new SimpleItemRecyclerViewAdapter(this, new ArrayList<Ship>(), mTwoPane);
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<Ship> list) {
+        adapter = new SimpleItemRecyclerViewAdapter(this, list, mTwoPane);
         recyclerView.setAdapter(adapter);
     }
 
