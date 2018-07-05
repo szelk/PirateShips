@@ -9,7 +9,7 @@ public class Ship {
     public Ship(JSONObject jsonObject) {
         id = jsonObject.optInt("id", 0);
         price = jsonObject.optInt("price", 0);
-        title = jsonObject.optString("title", "No title");
+        title = !jsonObject.isNull("title") ? jsonObject.optString("title", "No title") : "No title";
         description = jsonObject.optString("description", "No description");
         image = jsonObject.optString("image", null);
         greeting_type = jsonObject.optString("greeting_type", "Ahoi!");
