@@ -2,21 +2,27 @@ package hu.katzler.pirateships;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import hu.katzler.pirateships.dummy.DummyContent;
-
+import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import hu.katzler.pirateships.model.Ship;
 
 /**
  * An activity representing a list of PirateShips. This activity
@@ -33,17 +39,27 @@ public class PirateShipListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private GetListAsyncTask getListAsyncTask;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.pirateship_list)
+    RecyclerView recyclerView;
+    private SimpleItemRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pirateship_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this, this);
+
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,28 +76,32 @@ public class PirateShipListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        View recyclerView = findViewById(R.id.pirateship_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        //View recyclerView = findViewById(R.id.pirateship_list);
+        //assert recyclerView != null;
+        setupRecyclerView(recyclerView);
+
+        getListAsyncTask = new GetListAsyncTask();
+        getListAsyncTask.execute();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        adapter = new SimpleItemRecyclerViewAdapter(this, new ArrayList<Ship>(), mTwoPane);
+        recyclerView.setAdapter(adapter);
     }
 
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final PirateShipListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<Ship> mValues;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                Ship item = (Ship) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(PirateShipDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putInt(PirateShipDetailFragment.ARG_ITEM_ID, item.getId());
                     PirateShipDetailFragment fragment = new PirateShipDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -90,7 +110,7 @@ public class PirateShipListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, PirateShipDetailActivity.class);
-                    intent.putExtra(PirateShipDetailFragment.ARG_ITEM_ID, item.id);
+                    intent.putExtra(PirateShipDetailFragment.ARG_ITEM_ID, item.getId());
 
                     context.startActivity(intent);
                 }
@@ -98,7 +118,7 @@ public class PirateShipListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(PirateShipListActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      List<Ship> items,
                                       boolean twoPane) {
             mValues = items;
             mParentActivity = parent;
@@ -114,8 +134,8 @@ public class PirateShipListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.tvTitle.setText(mValues.get(position).getTitle());
+            holder.tvPrice.setText(String.format("%d GOLD", mValues.get(position).getPrice()));
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -126,15 +146,46 @@ public class PirateShipListActivity extends AppCompatActivity {
             return mValues.size();
         }
 
+        public void update(List<Ship> ships) {
+            mValues.clear();
+            mValues.addAll(ships);
+            notifyDataSetChanged();
+        }
+
         class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
+            final ImageView ivImage;
+            final TextView tvTitle;
+            final TextView tvPrice;
 
             ViewHolder(View view) {
                 super(view);
-                mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                ivImage = (ImageView) view.findViewById(R.id.ivImage);
+                tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+                tvPrice = (TextView) view.findViewById(R.id.tvPrice);
             }
+        }
+    }
+
+
+    class GetListAsyncTask extends AsyncTask<Void, Void, List<Ship>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //loading screen
+        }
+
+        @Override
+        protected List<Ship> doInBackground(Void... voids) {
+            List<Ship> list = App.get(PirateShipListActivity.this).getApplicationComponent().getPirateShipDownloader().downloadList();
+            return list;
+        }
+
+        @Override
+        protected void onPostExecute(List<Ship> ships) {
+            super.onPostExecute(ships);
+            Log.i(getClass().getSimpleName(), "ships: " + ships);
+            adapter.update(ships);
         }
     }
 }

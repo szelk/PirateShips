@@ -1,15 +1,15 @@
 package hu.katzler.pirateships;
 
 import android.app.Activity;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import hu.katzler.pirateships.dummy.DummyContent;
+import hu.katzler.pirateships.model.Ship;
 
 /**
  * A fragment representing a single Ship detail screen.
@@ -27,7 +27,7 @@ public class PirateShipDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
+    private Ship mItem;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -44,12 +44,13 @@ public class PirateShipDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            int id = getArguments().getInt(ARG_ITEM_ID);
+            mItem = App.get(getActivity()).getApplicationComponent().getPirateShipDownloader().getShip(id);
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
+                appBarLayout.setTitle(mItem.getTitle());
             }
         }
     }
@@ -61,7 +62,7 @@ public class PirateShipDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.pirateship_detail)).setText(mItem.details);
+            ((TextView) rootView.findViewById(R.id.pirateship_detail)).setText(mItem.getDescription());
         }
 
         return rootView;
