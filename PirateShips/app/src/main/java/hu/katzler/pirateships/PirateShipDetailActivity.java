@@ -10,6 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import hu.katzler.pirateships.model.Ship;
 
 /**
  * An activity representing a single Ship detail screen. This
@@ -19,10 +24,13 @@ import android.view.View;
  */
 public class PirateShipDetailActivity extends AppCompatActivity {
 
+    private ImageView ivImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pirateship_detail);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
@@ -41,6 +49,8 @@ public class PirateShipDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        ivImage = (ImageView) findViewById(R.id.ivImage);
+
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
         // (e.g. when rotating the screen from portrait to landscape).
@@ -54,13 +64,15 @@ public class PirateShipDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putInt(PirateShipDetailFragment.ARG_ITEM_ID,
-                    getIntent().getIntExtra(PirateShipDetailFragment.ARG_ITEM_ID, 0));
+            int id = getIntent().getIntExtra(PirateShipDetailFragment.ARG_ITEM_ID, 0);
+            Ship ship = App.get(this).getApplicationComponent().getPirateShipDownloader().getShip(id);
+            arguments.putInt(PirateShipDetailFragment.ARG_ITEM_ID, id);
             PirateShipDetailFragment fragment = new PirateShipDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.pirateship_detail_container, fragment)
                     .commit();
+            ImageLoader.getInstance().displayImage(ship.getImage(), ivImage);
         }
 
     }
