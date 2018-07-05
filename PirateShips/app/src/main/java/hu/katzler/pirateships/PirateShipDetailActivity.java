@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -72,7 +72,9 @@ public class PirateShipDetailActivity extends AppCompatActivity {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(PirateShipDetailActivity.this, ship.getGreetingType(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(PirateShipDetailActivity.this, ship.getGreetingType(), Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(PirateShipDetailActivity.this, R.style.MyAlertDialogTheme);
+                    builder.setTitle("Greetings").setMessage(ship.getGreetingType()).setNegativeButton("OK", null).show();
                 }
             });
         }
