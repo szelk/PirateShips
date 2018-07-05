@@ -3,6 +3,8 @@ package hu.katzler.pirateships.di.module;
 import android.app.Application;
 import android.content.Context;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -44,20 +46,10 @@ public class ApplicationModule {
     }
 
 //    @Provides
-//    @DatabaseInfo
-//    String provideDatabaseName() {
-//        return "demo-dagger.db";
+//    @Singleton
+//    ImageLoader getImageLoader() {
+//        return ImageLoader.getInstance();
 //    }
-//
-//    @Provides
-//    @DatabaseInfo
-//    Integer provideDatabaseVersion() {
-//        return 2;
-//    }
-//
-//    @Provides
-//    SharedPreferences provideSharedPrefs() {
-//        return mApplication.getSharedPreferences("demo-prefs", Context.MODE_PRIVATE);
-//    }
+
 }
 

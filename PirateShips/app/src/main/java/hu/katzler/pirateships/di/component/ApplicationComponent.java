@@ -3,6 +3,8 @@ package hu.katzler.pirateships.di.component;
 import android.app.Application;
 import android.content.Context;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -23,5 +25,7 @@ public interface ApplicationComponent {
     Application getApplication();
 
     PirateShipDownloader getPirateShipDownloader();
+
+    //ImageLoader getImageLoader();
 
 }

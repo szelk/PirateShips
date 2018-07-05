@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,8 +136,10 @@ public class PirateShipListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.tvTitle.setText(mValues.get(position).getTitle());
-            holder.tvPrice.setText(String.format("%d GOLD", mValues.get(position).getPrice()));
+            Ship ship = mValues.get(position);
+            holder.tvTitle.setText(ship.getTitle());
+            holder.tvPrice.setText(String.format("%d GOLD", ship.getPrice()));
+            ImageLoader.getInstance().displayImage(ship.getImage(), holder.ivImage);
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
